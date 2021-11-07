@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/rhino3dm@0.13.0/rhino3dm.min.js"></script>
+    <script>
+      rhino3dm().then((rhino) => {
+        console.log("Loaded rhino3dm");
+
+        let center = [0, 0, 0];
+        let radius = 10;
+        let sphere = new rhino.Sphere(center, radius);
+
+        let brep = sphere.toBrep();
+        let bbox = brep.getBoundingBox();
+        console.log("Min Pt(" + bbox.min + ") Max Pt(" + bbox.max + ")");
+
+        brep.setUserString("Test", "Hello Rhino!");
+        alert(brep.getUserString("Test"));
+
+        let model = new rhino.File3dm();
+        model.objects().add(brep, null);
+        saveByteArray("sphere.3dm", model.toByteArray());
+      });
+
+      function saveByteArray(fileName, byte) {
+        let blob = new Blob([byte], { type: "application/octect-stream" });
+        let link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = fileName;
+        // link.click()
+      }
+    </script>
+  </body>
+</html>
