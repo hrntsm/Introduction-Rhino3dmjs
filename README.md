@@ -76,8 +76,6 @@ function saveByteArray(fileName, byte) {
 
 ### 既存のファイルを読み取る
 
-
-
 ### まとめ
 
 詳細にどのようなことができるかは
@@ -100,3 +98,14 @@ function saveByteArray(fileName, byte) {
 Rhino で存在するタイプをそのまま作成、または既に作成されているもののデータを読み取ることしかできません。
 利点として、rhino3dm は Rhino がインストールされていなくても動作するので、
 例えば RhinoCompute などで生成したデータを保存したり中身をチェックするときに使えます。
+
+## React
+
+単純に上記のように HTML を使って書くことができますが、
+より拡張しやすく開発するために React を使ってこれまでのものを書いていきます。
+
+
+
+```bash
+npx create-react-app rhino-react --template typescript
+```
