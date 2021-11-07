@@ -1,7 +1,5 @@
 # Introduction to Rhino with React
 
-React で Rhino を使う
-
 Rhino に関する処理をコードでする際には一般的に C# や Python でやる場合が多いと思いますが、
 JS を使っても処理することができる場合があるので、試してみましょう。
 
