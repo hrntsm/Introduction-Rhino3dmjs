@@ -17,9 +17,19 @@
         brep.setUserString("Test", "Hello Rhino!");
         alert(brep.getUserString("Test"));
 
-        let model = new rhino.File3dm();
-        model.objects().add(brep, null);
-        saveByteArray("sphere.3dm", model.toByteArray());
+        let doc = new rhino.File3dm();
+
+        let attribute = new rhino.ObjectAttributes();
+        attribute.setUserString("Test", "Hello Rhino!");
+        doc.objects().add(brep, attribute);
+        attribute.layerIndex = 0;
+
+        const layer = new rhino.Layer();
+        layer.name = "CreatedLayer";
+        layer.color = { r: 255, g: 0, b: 0, a: 255 };
+        doc.layers().add(layer);
+
+        saveByteArray("sphere.3dm", doc.toByteArray());
       });
 
       function saveByteArray(fileName, byte) {
@@ -27,7 +37,7 @@
         let link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
         link.download = fileName;
-        // link.click()
+        // link.click();
       }
     </script>
   </body>

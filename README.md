@@ -60,9 +60,9 @@ alert(brep.getUserString("Test"));
 ```js
 rhino3dm().then((rhino) => {
   let sphere = new rhino.Sphere([1, 2, 3], 12);
-  let model = new rhino.File3dm();
-  model.objects().add(brep, null);
-  saveByteArray("sphere.3dm", model.toByteArray());
+  let doc = new rhino.File3dm();
+  doc.objects().add(sphere, null);
+  saveByteArray("sphere.3dm", doc.toByteArray());
 });
 
 function saveByteArray(fileName, byte) {
@@ -74,7 +74,102 @@ function saveByteArray(fileName, byte) {
 }
 ```
 
+なお、上で設定した UserString は、ジオメトリに結びついていて、
+Rhino の UI で確認するのは手間なので、
+以下のように objectAttribute として設定すると、Rhino 上でも確認することができます。
+
+```js
+rhino3dm().then((rhino) => {
+  let sphere = new rhino.Sphere([1, 2, 3], 12);
+  let doc = new rhino.File3dm();
+
+  let attribute = new rhino.ObjectAttribute();
+  attribute.setUserString("Test", "Hello Rhino Attribute!");
+
+  doc.objects().add(sphere, attribute);
+  saveByteArray("sphere.3dm", doc.toByteArray());
+});
+```
+
+以下のような形でレイヤーの設定をすることもできます。
+
+```js
+rhino3dm().then((rhino) => {
+  let doc = new rhino.File3dm();
+
+  const layer = new rhino.Layer();
+  layer.name = "CreatedLayer";
+  layer.color = { r: 255, g: 0, b: 0, a: 255 };
+  doc.layers().add(layer);
+
+  let attribute = new rhino.ObjectAttribute();
+  attribute.setUserString("Test", "Hello Rhino!");
+  attribute.layerIndex = 0;
+
+  let sphere = new rhino.Sphere([1, 2, 3], 12);
+  doc.objects().add(sphere, attribute);
+
+  saveByteArray("sphere.3dm", doc.toByteArray());
+});
+```
+
 ### 既存のファイルを読み取る
+
+ファイルを読み取る際も同様に始めます。
+ファイルを作成するサイトの違いは、読み取りたいファイルのパスは定数なので
+はじめに設定しておきます。
+
+```html
+<!DOCTYPE html>
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/rhino3dm@0.13.0/rhino3dm.min.js"></script>
+    <script>
+      // 読み取りたいファイルを指定しておく
+      const file = "sphere.3dm";
+
+      rhino3dm().then(async (rhino) => {
+        // ここにコードを入れていく
+      });
+    </script>
+  </body>
+</html>
+```
+
+まずファイルを読み込みます。
+ブラウザから直接ローカルファイルへアクセスすることはセキュリティにより制限されているため
+以下のような手順を踏んで、ローカルの 3dm ファイルを取り込みます。
+
+```js
+rhino3dm().then(async rhino => {
+  let res = await fetch(file);
+  let buffer = await res.arrayBuffer();
+  let arr = new Uint8Array(buffer);
+  let doc = rhino.File3dm.fromByteArray(arr);
+}
+```
+
+ファイル内の情報は、モデルを作成したときと逆のことをすれば確認できます。
+例えばジオメトリへの情報の取得は以下です。
+上で作成した sphere は objects の０番目に Add したので、
+０番目にアクセスすることでそれに関する情報を取得することができます。
+
+```js
+let objects = doc.objects();
+let obj = objects.get(0);
+console.log(obj.geometry().getUserStrings());
+console.log(obj.attributes().layerIndex);
+console.log(obj.attributes().getUserString("Test"));
+```
+
+レイヤーも同様です。
+
+```js
+let layers = doc.layers();
+let layer = layers.get(0);
+console.log(layer.name);
+console.log(layer.color);
+```
 
 ### まとめ
 
@@ -103,8 +198,6 @@ Rhino で存在するタイプをそのまま作成、または既に作成さ�
 
 単純に上記のように HTML を使って書くことができますが、
 より拡張しやすく開発するために React を使ってこれまでのものを書いていきます。
-
-
 
 ```bash
 npx create-react-app rhino-react --template typescript

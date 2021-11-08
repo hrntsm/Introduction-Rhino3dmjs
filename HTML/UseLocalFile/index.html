@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/rhino3dm@0.13.0/rhino3dm.min.js"></script>
+    <script>
+      const file = "sphere.3dm";
+
+      rhino3dm().then(async rhino => {
+        console.log("Loaded rhino3dm");
+        let res = await fetch(file);
+        let buffer = await res.arrayBuffer();
+        let arr = new Uint8Array(buffer);
+        let doc = rhino.File3dm.fromByteArray(arr);
+      
+        let objects = doc.objects();
+        let obj = objects.get(0);
+        console.log(obj.geometry().getUserStrings());
+        console.log(obj.attributes().layerIndex);
+        console.log(obj.attributes().getUserString("Test"));
+
+        let layers = doc.layers();
+        let layer = layers.get(0);
+        console.log(layer.name);
+        console.log(layer.color);
+      });
+    </script>
+  </body>
+</html>
