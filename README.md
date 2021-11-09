@@ -202,3 +202,8 @@ Rhino で存在するタイプをそのまま作成、または既に作成さ�
 ```bash
 npx create-react-app rhino-react --template typescript
 ```
+問題なくプロジェクトが作成されたら、以下を打ち込むとページがビルドされます。
+
+```bash
+npm start
+```

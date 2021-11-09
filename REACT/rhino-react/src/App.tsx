@@ -1,26 +1,21 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { RhinoModule, Sphere } from "rhino3dm";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+declare global {
+  interface Window {
+    rhino3dm: any;
+  }
 }
 
-export default App;
+export default function App() {
+
+  const [sphere, setSphere] = useState<Sphere>();
+  useEffect(() => {
+    window.rhino3dm().then((Module: RhinoModule) => {
+      setSphere(new Module.Sphere([1, 2, 3], 16));
+    });
+  }, []);
+
+  return <div className="App">{sphere && <p>{`sphere diameter is: ${sphere.diameter}`}</p>}</div>;
+}
