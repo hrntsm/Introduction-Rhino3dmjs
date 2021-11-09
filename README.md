@@ -202,8 +202,72 @@ Rhino で存在するタイプをそのまま作成、または既に作成さ�
 ```bash
 npx create-react-app rhino-react --template typescript
 ```
+
 問題なくプロジェクトが作成されたら、以下を打ち込むとページがビルドされます。
 
 ```bash
 npm start
 ```
+
+### 半径を表示する
+
+HTML ファイルに直接書いていたときと同様に Rhino3dm を使って球を作成しましょう。
+
+まず Index.ts ファイルを以下のように書き換えます。
+Rhino3dm の wasm を読み込む必要があるため、以下のように cdn を使って読み込んでいます。
+
+```ts
+import { StrictMode } from "react";
+import ReactDOM from "react-dom";
+
+import App from "./App";
+
+const rootElement = document.getElementById("root");
+
+const script = document.createElement("script");
+script.src = "https://cdn.jsdelivr.net/npm/rhino3dm@0.12.0/rhino3dm.min.js";
+script.addEventListener("load", () => {
+  ReactDOM.render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+    rootElement
+  );
+});
+document.body.appendChild(script);
+```
+
+次に App.ts を以下のように書き換えます。
+
+```ts
+import React, { useEffect, useState } from "react";
+import { RhinoModule, Sphere } from "rhino3dm";
+import "./App.css";
+
+declare global {
+  interface Window {
+    rhino3dm: any;
+  }
+}
+
+export default function App() {
+  const [sphere, setSphere] = useState<Sphere>();
+  useEffect(() => {
+    window.rhino3dm().then((Module: RhinoModule) => {
+      setSphere(new Module.Sphere([1, 2, 3], 16));
+    });
+  }, []);
+
+  return (
+    <div className="App">
+      {sphere && <p>{`sphere diameter is: ${sphere.diameter}`}</p>}
+    </div>
+  );
+}
+```
+
+これで `npm start` で動作を確認するとブラウザに球の直径が表示されます。
+
+
+ここら辺使ってちょっと見た目をリッチにする
+https://qiita.com/seira/items/e62890f11e91f6b9653f
