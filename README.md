@@ -267,3 +267,199 @@ export default function App() {
 ```
 
 これで `npm start` で動作を確認するとブラウザに球の直径が表示されます。
+
+### UI を作成する
+
+ブラウザにただ結果のテキストが表示されるだけでは React を使っている意味がないので、簡単に UI を整えてみます。
+ここでは mui を使って見た目を整えていきます。
+
+公式サイト
+
+- https://mui.com/
+
+#### タイトルバーをつける
+
+ページの上にタイトルバーをつけてみます。
+タイトルバーには mui の [App Bar](https://mui.com/components/app-bar/) を使って作ります。
+
+新しく AppBar.tsx というファイルを作成します。
+作成したら基本的には公式サイトから取得できるサンプルのコードを使用します。
+ここでは最初に出てくる Basic App Bar を使います。
+
+```ts
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+
+export default function ButtonAppBar(prop: any) {
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            {prop.title}
+          </Typography>
+          <Button color="inherit">Login</Button>
+        </Toolbar>
+      </AppBar>
+    </Box>
+  );
+}
+```
+
+今回使わない部分もありますが、全部を触れていられないため将来のために残しておきます。
+
+公式のサンプルとことなる点は、prop を受け取って表示するタイトルを変更できるようにしています。
+
+作成した AppBar を App.tsx に追加して表示されるようにしましょう。
+それに加えて今後拡張しやすくするため、球を作成している部分を CreateSphere として分割します。
+
+```ts
+function CreateSphere() {
+  const [sphere, setSphere] = useState<Sphere>();
+  useEffect(() => {
+    window.rhino3dm().then((Module: RhinoModule) => {
+      setSphere(new Module.Sphere([1, 2, 3], 16));
+    });
+  }, []);
+
+  return (
+    <div className="App">
+      {sphere && <p>{`sphere diameter is: ${sphere.diameter}`}</p>}
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <div>
+      <ButtonAppBar title="Rhino3dm Test Project" />
+      <CreateSphere />
+    </div>
+  );
+}
+```
+
+#### スライダーをつける
+
+事前に書いたコードの指定された文の球が作成されても面白みが無いため、
+スライダーをつけてブラウザから球の半径を変えられるようにします。
+
+スライダーは mui の [Slider](https://mui.com/components/slider/) を使って作成します。
+
+タイトルバーは別の tsx ファイルを作成しましたが、こちらは球の作成に紐付いているので、CreateSphere 内に記入します。
+
+これまでは useEffect を使ってページを開いたときに球を作成していましたが、スライダーを動かしたときにモデルを作成したいので、useEffect を削除します。
+そして、スライダーの値が変化したときのイベントを受け取って動く onChange を作成します。
+表示される文字列は、最初は球が作成されていないのでエラーにならないよう、三項演算子を使って値を切り替えるようにしています。
+
+```ts
+function CreateSphere() {
+  const [sphere, setSphere] = useState<Sphere>();
+
+  const onChange = (e: any) => {
+    window.rhino3dm().then((Module: RhinoModule) => {
+      setSphere(new Module.Sphere([1, 2, 3], e.target.value));
+      console.log(sphere);
+    });
+  };
+
+  return (
+    <div>
+      <p>
+        {sphere
+          ? "生成された Sphere の直径は " + sphere.diameter + " です。"
+          : "Sphere はまだ作成されていません"}
+      </p>
+      <Box width={300}>
+        <Slider
+          defaultValue={16}
+          valueLabelDisplay="auto"
+          onChange={onChange}
+        />
+      </Box>
+    </div>
+  );
+}
+```
+
+#### 作ったファイルをダウンロードする
+
+作成したモデルがちゃんと想定通りに作成されているか確認するために、モデルをダウンロードできるようにします。
+
+ここでは mui の [Button](https://mui.com/components/buttons/) を使って作成します。ボタンをクリックした際に onClick が呼ばれるようにしています。
+
+```ts
+<Button variant="contained" onClick={onClick}>
+  Download
+</Button>
+```
+
+onClick は HTML で作成したときの内容とほぼ同じです。
+TS で書くために型を追記したり、Hook を使うために sphere の値を使ったりしています。
+
+```ts
+const onClick = () => {
+  window.rhino3dm().then((Module: RhinoModule) => {
+    let doc: File3dm = new Module.File3dm();
+
+    if (sphere) {
+      let item = new Module.Sphere(
+        sphere.center as number[],
+        sphere.radius as number
+      );
+      // @ts-ignore
+      doc.objects().addSphere(item, null);
+      saveByteArray("sphere.3dm", doc.toByteArray());
+    } else {
+      alert("Sphere not created");
+    }
+  });
+};
+
+const saveByteArray = (fileName: string, byte: any) => {
+  let blob = new Blob([byte], { type: "application/octect-stream" });
+  let link = document.createElement("a");
+  link.href = window.URL.createObjectURL(blob);
+  link.download = fileName;
+  link.click();
+};
+
+return (
+  <div>
+    <p>
+      {sphere
+        ? "生成された Sphere の直径は " + sphere.diameter + " です。"
+        : "Sphere はまだ作成されていません"}
+    </p>
+    <Box width={300}>
+      <Slider defaultValue={16} valueLabelDisplay="auto" onChange={onChange} />
+    </Box>
+    <Button variant="contained" onClick={onClick}>
+      Download
+    </Button>
+  </div>
+);
+```
+
+これで Download ボタンを押すと 3dm ファイルがダウンロードされます。
+
+### 既存のファイルを読み込む
+
+### まとめ
+
+React と mui を使って簡単な UI を作って Rhino3dm を扱えるようにしました。
+モデルの可視化などは Threejs を使うとできたりするので、興味がある方はやってみてください。
