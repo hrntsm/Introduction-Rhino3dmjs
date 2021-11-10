@@ -27,10 +27,15 @@ function CreateSphere() {
   const onClick = () => {
     window.rhino3dm().then((Module: RhinoModule) => {
       let doc: File3dm = new Module.File3dm();
-      console.log(doc.objects());
-      let aa:Sphere = new Module.Sphere([1, 2, 3], 10);
-      doc.objects().addSphere(aa, null);
-      saveByteArray("sphere.3dm", doc.toByteArray());
+
+      if (sphere) {
+        let item = new Module.Sphere((sphere.center as number[]), (sphere.radius as number));
+        // @ts-ignore
+        doc.objects().addSphere(item, null);
+        saveByteArray("sphere.3dm", doc.toByteArray());
+      } else {
+        alert("Sphere not created");
+      }
     });
   }
 
