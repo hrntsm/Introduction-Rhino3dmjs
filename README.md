@@ -267,7 +267,3 @@ export default function App() {
 ```
 
 これで `npm start` で動作を確認するとブラウザに球の直径が表示されます。
-
-
-ここら辺使ってちょっと見た目をリッチにする
-https://qiita.com/seira/items/e62890f11e91f6b9653f

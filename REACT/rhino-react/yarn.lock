@@ -10214,10 +10214,10 @@
   "resolved" "https://registry.npmjs.org/rgba-regex/-/rgba-regex-1.0.0.tgz"
   "version" "1.0.0"
 
-"rhino3dm@^7.7.0":
-  "integrity" "sha512-WRIrU6ml6nWeQLJnKgqgXlsVPPCbaEostoIMW5j8djr6KSMTYKJegqTHt8mzW2S0IMa9x/OMxCjXcAzsK6iHOw=="
-  "resolved" "https://registry.npmjs.org/rhino3dm/-/rhino3dm-7.7.0.tgz"
-  "version" "7.7.0"
+"rhino3dm@^0.15.0-beta":
+  "integrity" "sha512-b4BZsTNs4lm1RdttXpB2LuktFSFiR6U0PAdeFsDtQHAJDC/8lewRJjpscZAYWXWG7fihvMYDpPKV9oHY4mCOTA=="
+  "resolved" "https://registry.npmjs.org/rhino3dm/-/rhino3dm-0.15.0-beta.tgz"
+  "version" "0.15.0-beta"
 
 "rimraf@^2.5.4", "rimraf@^2.6.3":
   "integrity" "sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w=="
