@@ -75,9 +75,9 @@ export function CreateSphere() {
       <Button variant="outlined" onClick={onClick}>Download</Button>
       <Snackbar
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleClose}
-        message="Note archived"
+        message="Sphere はまだ作成されていません"
         action={action}
       />
     </div>

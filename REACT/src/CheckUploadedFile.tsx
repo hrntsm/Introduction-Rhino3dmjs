@@ -84,7 +84,7 @@ export function CheckUploadedFile() {
       <BasicTable data={userStrings} />
       <Snackbar
         open={openNoFile.open}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleClose}
         message={openNoFile.message}
         action={action}

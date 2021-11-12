@@ -13,7 +13,7 @@ declare global {
 export default function App() {
   return (
     <div>
-      <ButtonAppBar title="Rhino3dm Test Project" />
+      <ButtonAppBar title="Rhino3dm.js Intro Page!!" />
       <CreateSphere />
       <CheckUploadedFile />
     </div>
