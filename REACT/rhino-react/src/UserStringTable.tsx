@@ -13,7 +13,7 @@ export default function BasicTable(prop: any) {
                 <div>
                     <p>{"Geometry Index:" + gIndex}</p>
                     <TableContainer sx={{ width: 300 }} component={Paper}>
-                        <Table  aria-label="simple table">
+                        <Table aria-label="simple table">
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Index</TableCell>
