@@ -5,6 +5,9 @@ JS を使っても処理することができる場合があるので、試し�
 
 JS を使ってやる利点としてはブラウザで動くので使用者側に特に環境構築が必要ないということがあります。
 
+ハンズオンで最終的に作成するもののは以下のページを想定しています。
+- [Rhino3dm.js Intro Page](https://hiron.dev/Introduction-Rhino3dmjs/)
+
 ## html の中で Rhino3dm を使う
 
 rhino3dm は Rhino のデータを操作することが主な目的のものになっています。
