@@ -459,6 +459,21 @@ return (
 
 ### 既存のファイルを読み込む
 
+Work In Progress
+
+### Build して Deploy する
+
+では完成したページをデプロイしましょう。
+ここではGitHub Pages を使います。手順は以下です。
+
+1. package.json に `"homepage": "."` を追加
+1. ターミナルで `npm run build` を実行する
+1. ページが build フォルダに作成される
+1. フォルダ名を docs に変えて、ルートディレクトリに移動する
+1. GitHub にプッシュする
+1. GitHub Pages の設定から Source を今プッシュしたブランチの docs にする
+1. リポジトリのトップページの Environments を見ると作成したページのリンクがあるのでそこへ飛ぶ
+
 ### まとめ
 
 React と mui を使って簡単な UI を作って Rhino3dm を扱えるようにしました。
