@@ -477,7 +477,10 @@ return (
 
 HTML でやっていたときはファイルのパスを直接指定していましたが、
 ここではボタンをつけてそこからファイルを選択できるようにします。
-ファイルをアップロードするための関数 CheckUploadedFile 関数を作成します。
+
+#### Input と Check ボタンを作る
+
+まずファイルをアップロードしてそれを処理するための関数 CheckUploadedFile 関数を作成します。
 
 ```ts
 function CheckUploadedFile() {
@@ -511,18 +514,35 @@ function CheckUploadedFile() {
 }
 ```
 
-インプットしたあとファイルをチェックするチェックボタンは mui の Button を使っています。
+インプットしたあとにファイルをチェックするボタンは mui の Button を使っています。
 球を作ったときの Download ボタンと同じです。
 
-onClick で最後の console にファイルの中身を表示しているだけでは UI には出てこないので、
+作成したものが表示されるように App 関数 の return を以下のようにします。
+
+```ts
+export default function App() {
+  return (
+    <div>
+      <ButtonAppBar title="Rhino3dm.js Intro Page!!" />
+      <CreateSphere />
+      <CheckUploadedFile />
+    </div>
+  );
+}
+```
+
+#### UserString を表示する表を作成する
+
+今の設定では、onClick で最後の console にファイルの中身を表示しているだけでは UI には出てこないので、
 HTML の部分でやったように UserStrings を取得して表示できるようにします。UserString は複数の値が許容されている連想配列なので、表形式で表示します。
 
-表には mui の[table](https://mui.com/components/tables/) を使用します。
+表には mui の [table](https://mui.com/components/tables/) を使用します。
 
 UserString を table に書き込む UserStringTable.tsx を作成して以下のようにします。
 基本的には公式のサンプルを使っていますが、UserString を持っていない場合などにエラーにならないための処理を追加しています。
 
-表示したいデータは prop.data で受け取るようにしているので、使う際には data に表示したい UserStrings を渡す形式にしています。
+表示するデータは prop.data で受け取るようにしているので、
+使う際には data に UserStrings を渡す形式にしています。
 
 ```ts
 import Table from "@mui/material/Table";
@@ -574,6 +594,8 @@ export default function BasicTable(prop: any) {
   );
 }
 ```
+
+#### 作ったものをまとめる
 
 UserStringTable ができたのでそれを使って、読み込んだファイルの UserString が表示されるようにします。
 
