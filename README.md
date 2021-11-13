@@ -1,24 +1,23 @@
 # Introduction to Rhino with React
 
-Rhino に関する処理をコードでする際には一般的に C# や Python でやる場合が多いと思いますが、
-JS を使っても処理することができる場合があるので、試してみましょう。
+In general, you can use C# or Python to handle Rhino in your code.
+JS can also be used in some cases, so let's give it a try.
 
-JS を使ってやる利点としてはブラウザで動くので使用者側に特に環境構築が必要ないということがあります。
+One of the advantages of using JS is that it runs in a browser, so the user does not need to build any particular environment.
 
-ハンズオンで最終的に作成するもののは以下のページを想定しています。
+The following pages are expected to be created in the hands-on session.
 
 - [Rhino3dm.js Intro Page](https://hiron.dev/Introduction-Rhino3dmjs/)
 
-## html の中で Rhino3dm を使う
+## Use Rhino3dm in html
 
-rhino3dm は Rhino のデータを操作することが主な目的のものになっています。
-ですので、高級な関数（例えば NURBS サーフェスをメッシュ化する）を使うことはできません。
-簡単な処理に使ってみましょう。
+The main purpose of rhino3dm is to handle Rhino data.
+Therefore, you cannot use advanced geometry functions (e.g., meshing a NURBS surface).
+Let's use it for simple operations.
 
-### 新しく作成する
+### Create new geometry
 
-注意点ですが、JS の Rhino3dm の処理は wasm を使っているため、
-動作は非同期になるように、await や then() などを使って処理する必要があります。
+It is important to note that Rhino3dm.js uses wasm, so it is necessary to use await, then(), etc. to make the operation asynchronous.
 
 ```html
 <!DOCTYPE html>
@@ -27,14 +26,14 @@ rhino3dm は Rhino のデータを操作することが主な目的のものに�
     <script src="https://cdn.jsdelivr.net/npm/rhino3dm@0.13.0/rhino3dm.min.js"></script>
     <script>
       rhino3dm().then((rhino) => {
-        // ここにコードを入れていく
+        // Add code
       }
     </script>
   </body>
 </html>
 ```
 
-以下のコードでは球を作ることができます。
+The following code can be used to create a sphere.
 
 ```js
 let center = [0, 0, 0];
@@ -42,7 +41,7 @@ let radius = 10;
 let sphere = new rhino.Sphere(center, radius);
 ```
 
-以下のようにすることがバウンディングボックスを取得することもできます。
+You can also get a bounding box by doing the following
 
 ```js
 let brep = sphere.toBrep();
@@ -50,16 +49,15 @@ let bbox = brep.getBoundingBox();
 console.log("Min Pt(" + bbox.min + ") Max Pt(" + bbox.max + ")");
 ```
 
-文字列を追加することもできます。
-以下の例では作成した sphere の Brep に対して key: Test, value: Hello Rhino! の文字列を追加しており、
-Hello Rhino! が出力されます。
+You can also add strings.
+In the following example, the key: Test, value: Hello Rhino! is added to the Brep of the sphere that we created, and The output is Hello Rhino!
 
 ```js
 brep.setUserString("Test", "Hello Rhino!");
 alert(brep.getUserString("Test"));
 ```
 
-作成したデータは 3dm ファイルとしてダウンロードして取得することができます。
+The created data can be downloaded and retrieved as a 3dm file.
 
 ```js
 rhino3dm().then((rhino) => {
@@ -78,9 +76,8 @@ function saveByteArray(fileName, byte) {
 }
 ```
 
-なお、上で設定した UserString は、ジオメトリに結びついていて、
-Rhino の UI で確認するのは手間なので、
-以下のように objectAttribute として設定すると、Rhino 上でも確認することができます。
+Since the UserString set above is associated with the geometry and it is not easy to check it in the Rhino UI,
+you can check it in Rhino by setting it as an objectAttribute as shown below.
 
 ```js
 rhino3dm().then((rhino) => {
@@ -95,7 +92,7 @@ rhino3dm().then((rhino) => {
 });
 ```
 
-以下のような形でレイヤーの設定をすることもできます。
+You can also set up layers in the following way.
 
 ```js
 rhino3dm().then((rhino) => {
@@ -117,11 +114,10 @@ rhino3dm().then((rhino) => {
 });
 ```
 
-### 既存のファイルを読み取る
+### Load & read local 3dm file
 
-ファイルを読み取る際も同様に始めます。
-ファイルを作成するサイトの違いは、読み取りたいファイルのパスは定数なので
-はじめに設定しておきます。
+Start in the same way when reading a file.
+The difference is that the site where the file is created has a constant path to the file to be read. Set it in the beginning.
 
 ```html
 <!DOCTYPE html>
@@ -129,20 +125,19 @@ rhino3dm().then((rhino) => {
   <body>
     <script src="https://cdn.jsdelivr.net/npm/rhino3dm@0.13.0/rhino3dm.min.js"></script>
     <script>
-      // 読み取りたいファイルを指定しておく
+      // Set file path
       const file = "sphere.3dm";
 
       rhino3dm().then(async (rhino) => {
-        // ここにコードを入れていく
+        // Add code
       });
     </script>
   </body>
 </html>
 ```
 
-まずファイルを読み込みます。
-ブラウザから直接ローカルファイルへアクセスすることはセキュリティにより制限されているため
-以下のような手順を踏んで、ローカルの 3dm ファイルを取り込みます。
+First, load the file.
+Accessing local files directly from the browser is restricted by security. The following steps are required to import a local 3dm file.
 
 ```js
 rhino3dm().then(async rhino => {
@@ -153,10 +148,9 @@ rhino3dm().then(async rhino => {
 }
 ```
 
-ファイル内の情報は、モデルを作成したときと逆のことをすれば確認できます。
-例えばジオメトリへの情報の取得は以下です。
-上で作成した sphere は objects の０番目に Add したので、
-０番目にアクセスすることでそれに関する情報を取得することができます。
+You can check the information in the file by doing the opposite of what you did when you created the model.
+For example, here is how to get the information to the geometry
+The sphere we created above was added to the 0th object, so we can access the You can get information about it by accessing the 0th object.
 
 ```js
 let objects = doc.objects();
@@ -166,7 +160,7 @@ console.log(obj.attributes().layerIndex);
 console.log(obj.attributes().getUserString("Test"));
 ```
 
-レイヤーも同様です。
+The same goes for layers.
 
 ```js
 let layers = doc.layers();
@@ -175,58 +169,53 @@ console.log(layer.name);
 console.log(layer.color);
 ```
 
-### まとめ
+### Summary
 
-詳細にどのようなことができるかは
-[公式ドキュメント](https://mcneel.github.io/rhino3dm/javascript/api/index.html)
-を確認してみてください。
+Check out
+[the official documentation](https://mcneel.github.io/rhino3dm/javascript/api/index.html)
+to see what you can do in detail.
 
-このドキュメント少し不親切で、どの型がどの型を継承しているかが書かれていません。
+The documentation is a bit unfriendly and does not say which types inherit from which types.
 
-- バウンディングボックスの取得は GeometryBase クラス
-- 文字列の追加は CommonObject クラス
-
-に書かれており、それらを Brep クラスは継承しているため使えます。
-そういった敬称関係は
+Note that you need to look at the SDK of
 [RhinoCommon](https://developer.rhino3d.com/api/RhinoCommon/html/R_Project_RhinoCommon.htm)
-の SDK を見ないとわからないためで注意が必要です。
+to understand the inheritance relationship.
 
-できること概ねこのようなことで、例えば「複数のカーブを使って Sweep する」
-のようなことできません。
+This is generally what you can do, and you can't, for example, use multiple curves for sweeping.
 
-Rhino で存在するタイプをそのまま作成、または既に作成されているもののデータを読み取ることしかできません。
-利点として、rhino3dm は Rhino がインストールされていなくても動作するので、
-例えば RhinoCompute などで生成したデータを保存したり中身をチェックするときに使えます。
+It can only create the type as it exists in Rhino, or read the data of what has already been created.
+The advantage is that rhino3dm does not require Rhino to be installed.
+It can be used to store and check the contents of data generated by RhinoCompute, for example.
 
-## React で Rhino3dm を使う
+## Use Rhino3dm in React
 
-単純に上記のように HTML を使って書くことができますが、
-より拡張しやすく開発するために React を使ってこれまでのものを書いていきます。
+We can simply write it using HTML as shown above, but We will use React to write what we have so far for more extensible development.
 
-### REACT を触ってみる
+### Try React sample
 
-以下のように打ち込むと REACT のサンプルのデータが作成されます。
-ここでは `--template typescript` として TypeScript として作成していますが、
-template を指定しないと JavaScript で作成されます。
+If you type the following, the data for the React sample will be created.
+In this example, the data is created as TypeScript using `--template typescript`.
+If you don't specify `template typescript`, the data will be created as JavaScript.
 
 ```bash
 npx create-react-app rhino-react --template typescript
 ```
 
-問題なくプロジェクトが作成されたら、以下を打ち込むとページがビルドされサンプルのページが表示されます。
+Once the project has been created without any problems, type the following to build the page and display the sample page.
 
 ```bash
 npm start
 ```
 
-これで簡単な REACT をつかったサイトが作成されました。
+This will create a simple site using React.
 
-### 半径を表示する
+### Display sphere diameter
 
-HTML ファイルに直接書いていたときと同様に Rhino3dm を使って球を作成しましょう。
+Let's use Rhino3dm to create the spheres as we did when we wrote them directly in the HTML file.
 
-まず Index.tsx ファイルを以下のように書き換えます。
-Rhino3dm の wasm を読み込む必要があるため、以下のように cdn を使って読み込んでいます。
+The first step is to rewrite the Index.tsx file as follows.
+Since we need to load the Rhino3dm wasm, we use cdn to load it as follows.
+This will create a simple site using REACT.
 
 ```ts
 import { StrictMode } from "react";
@@ -249,7 +238,7 @@ script.addEventListener("load", () => {
 document.body.appendChild(script);
 ```
 
-次に App.ts を以下のように書き換えます。
+Next, rewrite App.ts as follows.
 
 ```ts
 import React, { useEffect, useState } from "react";
@@ -278,26 +267,25 @@ export default function App() {
 }
 ```
 
-これで `npm start` で動作を確認するとブラウザに球の直径が表示されます。
+Now, when you check the operation with `npm start`, you will see the diameter of the sphere in your browser.
 
-### UI を作成する
+### Add GUI
 
-ブラウザにただ結果のテキストが表示されるだけでは
-React を使っている利点があまり活かせていないのでがないので、簡単に UI を整えてみます。
-ここでは mui を使って見た目を整えていきます。
+Just displaying the result text in the browser is not enough. So, let's try to prepare the UI in a easy way.
+In this section, we will use mui to adjust the appearance.
 
-公式サイト
+Official site
 
 - https://mui.com/
 
-#### タイトルバーをつける
+#### Add title bar
 
-ページの上にタイトルバーをつけてみます。
-タイトルバーには mui の [App Bar](https://mui.com/components/app-bar/) を使って作ります。
+Let's add a title bar to the top of the page.
+The title bar will be created using mui's [App Bar](https://mui.com/components/app-bar/).
 
-新しく AppBar.tsx というファイルを作成します。
-作成したら基本的には公式サイトから取得できるサンプルのコードを使用します。
-ここでは最初に出てくる Basic App Bar を使います。
+Create a new file called AppBar.tsx.
+After creating the file, basically use the sample code that you can get from the official website.
+In this example, we will use the Basic App Bar that comes up first.
 
 ```ts
 import AppBar from "@mui/material/AppBar";
@@ -333,12 +321,12 @@ export default function ButtonAppBar(prop: any) {
 }
 ```
 
-今回使わない部分もありますが、将来のために残しておきます。
+There are some parts that will not be used this time, but I will leave them for the future.
 
-公式のサンプルと異なる点は、prop を受け取って表示するタイトルを変更できるようにしています。
+The difference from the official sample is that we can change the title to be displayed by receiving the prop.
 
-作成した AppBar を App.tsx に追加して表示されるようにしましょう。
-それに加えて今後拡張しやすくするため、球を作成している部分を CreateSphere 関数として分割します。
+Let's add the AppBar we created to App.tsx so that it will be displayed.
+In addition, to make it easier to expand in the future, we will split the part that creates the sphere as a CreateSphere function.
 
 ```ts
 function CreateSphere() {
@@ -366,21 +354,22 @@ export default function App() {
 }
 ```
 
-#### スライダーをつける
+#### Add slider
 
-事前に書いたコードの指定された通りの球が作成されては UI として十分ではないため、
-スライダーをつけてブラウザから球の半径を変えられるようにします。
+Since it is not enough for the UI to create the sphere as specified in the pre-written code,
+we added a slider to change the radius of the sphere from the browser.
+Therefore, we will add a slider so that the radius of the sphere can be changed from the browser.
 
-スライダーは mui の [Slider](https://mui.com/components/slider/) を使って作成します。
+The slider will be created using mui's [Slider](https://mui.com/components/slider/).
 
-タイトルバーは別の tsx ファイルを作成しましたが、
-こちらは球の作成に紐付いているので、CreateSphere 内に記入することにします。
+For the title bar, I created a separate tsx file.
+The title bar was created in a separate tsx file, but since it is tied to the creation of the sphere, we will fill it in in CreateSphere.
 
-これまでは useEffect を使ってページを開いたときに球を作成していましたが、
-スライダーを動かしたときにモデルを作成したいので、useEffect を削除します。
+So far, we have used useEffect to create the sphere when the page is opened.
+We want to create the model when the slider is moved, so we will remove useEffect.
 
-そして、スライダーの値が変化したときのイベントを受け取って動く onChange を作成します。
-表示される文字列は、最初は球が作成されていないのでエラーにならないよう、三項演算子を使って値を切り替えるようにしています。
+Then, create an onChange that receives and acts on the event when the slider value changes.
+As for the string to be displayed, we use the ternary operator to switch the value so that no error occurs since the sphere is not created at first.
 
 ```ts
 function CreateSphere() {
@@ -397,8 +386,8 @@ function CreateSphere() {
     <div>
       <p>
         {sphere
-          ? "生成された Sphere の直径は " + sphere.diameter + " です。"
-          : "Sphere はまだ作成されていません"}
+          ? "Sphere diameter is " + sphere.diameter
+          : "Sphere is not yet created"}
       </p>
       <Box width={300}>
         <Slider
@@ -412,11 +401,12 @@ function CreateSphere() {
 }
 ```
 
-#### 作ったファイルをダウンロードする
+#### Download create 3dm file
 
-作成したモデルがちゃんと想定通りに作成されているか確認するために、モデルをダウンロードできるようにします。
+In order to make sure that the model is created as expected, we will make the model available for download.
 
-ここでは mui の [Button](https://mui.com/components/buttons/) を使って作成します。ボタンをクリックした際に onClick が呼ばれるようにしています。
+We will use mui's [Button](https://mui.com/components/buttons/) to do this.
+We make sure that onClick is called when the button is clicked.
 
 ```ts
 <Button variant="contained" onClick={onClick}>
@@ -424,8 +414,8 @@ function CreateSphere() {
 </Button>
 ```
 
-onClick は HTML で作成したときの内容とほぼ同じです。
-TS で書くために型を追記したり、Hook を使うために sphere の値を使ったりしています。
+The onClick is almost the same as the HTML version.
+I added the type to write it in TS, and used the sphere value to use the Hook.
 
 ```ts
 const onClick = () => {
@@ -458,8 +448,8 @@ return (
   <div>
     <p>
       {sphere
-        ? "生成された Sphere の直径は " + sphere.diameter + " です。"
-        : "Sphere はまだ作成されていません"}
+        ? "Sphere diameter is " + sphere.diameter
+        : "Sphere is not yet created"}
     </p>
     <Box width={300}>
       <Slider defaultValue={16} valueLabelDisplay="auto" onChange={onChange} />
@@ -471,16 +461,16 @@ return (
 );
 ```
 
-これで Download ボタンを押すと 3dm ファイルがダウンロードされます。
+Now click the Download button to download the 3dm file.
 
-### 既存のファイルを読み込む
+### Load local file
 
-HTML でやっていたときはファイルのパスを直接指定していましたが、
-ここではボタンをつけてそこからファイルを選択できるようにします。
+When we used HTML, we had to specify the file path directly, 
+but now we will add a button to select the file from there.
 
-#### Input と Check ボタンを作る
+#### Add input & check button
 
-まずファイルをアップロードしてそれを処理するための関数 CheckUploadedFile 関数を作成します。
+First, create a function CheckUploadedFile that uploads a file and processes it.
 
 ```ts
 function CheckUploadedFile() {
@@ -514,10 +504,10 @@ function CheckUploadedFile() {
 }
 ```
 
-インプットしたあとにファイルをチェックするボタンは mui の Button を使っています。
-球を作ったときの Download ボタンと同じです。
+The button to check the file after inputting it uses the mui Button.
+It is the same as the Download button when we created the sphere.
 
-作成したものが表示されるように App 関数 の return を以下のようにします。
+To display what you have created, make the return of the App function as follows
 
 ```ts
 export default function App() {
@@ -531,18 +521,19 @@ export default function App() {
 }
 ```
 
-#### UserString を表示する表を作成する
+#### Create UserString tables
 
-今の設定では、onClick で最後の console にファイルの中身を表示しているだけでは UI には出てこないので、
-HTML の部分でやったように UserStrings を取得して表示できるようにします。UserString は複数の値が許容されている連想配列なので、表形式で表示します。
+In the current configuration, 
+the contents of the file are displayed in the console at the end of onClick, but not in the UI.
+Since UserStrings are maps that allow multiple values, we will display them in a tabular format.
 
-表には mui の [table](https://mui.com/components/tables/) を使用します。
+Since UserString is a maps that allows multiple values, we will display it in tabular form, using mui's [table](https://mui.com/components/tables/) for the table.
 
-UserString を table に書き込む UserStringTable.tsx を作成して以下のようにします。
-基本的には公式のサンプルを使っていますが、UserString を持っていない場合などにエラーにならないための処理を追加しています。
+Create a UserStringTable.tsx that writes the UserString to the table and do the following
+Basically, I use the official sample, but I add some processing to avoid errors when I don't have a UserString.
 
-表示するデータは prop.data で受け取るようにしているので、
-使う際には data に UserStrings を渡す形式にしています。
+The data to be displayed is received in prop.data, so The data to be displayed is received in prop.data,
+so we pass UserStrings to data when using it.
 
 ```ts
 import Table from "@mui/material/Table";
@@ -595,16 +586,16 @@ export default function BasicTable(prop: any) {
 }
 ```
 
-#### 作ったものをまとめる
+#### Summarize created components
 
-UserStringTable ができたのでそれを使って、読み込んだファイルの UserString が表示されるようにします。
+Now that we have a UserStringTable, we will use it to display the UserString of the loaded file.
 
-追加した事項は以下です。
+The following is what we have added.
 
-- 読み込んだ UserString を扱う Hooks を追加
-- onClick で取得した doc を CreateUserStringList に渡す部分を追加
-- doc から UserStrings を取得する CreateUserStringList を作成
-- return 内に Table を表示するための BasicTable を追加
+- Added Hooks for handling loaded UserString
+- Add a section to pass the doc retrieved by onClick to CreateUserStringList
+- Create CreateUserStringList to get UserStrings from doc
+- Added BasicTable to display a table in return
 
 ```ts
 function CheckUploadedFile() {
@@ -660,24 +651,24 @@ function CheckUploadedFile() {
 }
 ```
 
-### Build して Deploy する
+### Build & Deploy
 
-完成したページをデプロイしましょう。
-ここでは GitHub Pages を使います。手順は以下です。
+Let's deploy the completed page.
+In this case, we will use GitHub Pages. The steps are as follows
 
-1. package.json に `"homepage": "."` を追加
-1. ターミナルで `npm run build` を実行する
-1. ページが build フォルダに作成される
-1. フォルダ名を docs に変えて、ルートディレクトリに移動する
-1. GitHub にプッシュする
-1. GitHub Pages の設定から Source を今プッシュしたブランチの docs にする
-1. リポジトリのトップページの Environments を見ると作成したページのリンクがあるのでそこへ飛ぶ
+1. Add `"homepage": "."" to package.json. to package.json
+1. Run `npm run build` in a terminal.
+1. The page will be created in the build folder.
+1. Rename the folder to "docs" and move it to the root directory.
+1. Push to GitHub
+1. In the GitHub Pages settings, set Source to the docs of the branch you just pushed
+1. On the top page of the repository, look at Environments and you will see a link to the page you just created.
 
-問題なくビルドされていれば以下のようなページが公開されます。
+If it builds without any problems, a page like the following will be published.
 
 - [Rhino3dm.js Intro Page](https://hiron.dev/Introduction-Rhino3dmjs/)
 
-### まとめ
+### Summary
 
-React と mui を使った簡単な UI を作って Rhino3dm を扱えるようにしました。
-モデルの可視化などは Threejs を使うとできたりするので、興味がある方はやってみてください。
+We created a simple UI using React and mui to handle Rhino3dm.
+You can use Threejs to visualize the model, so if you are interested in that, please give it a try.
